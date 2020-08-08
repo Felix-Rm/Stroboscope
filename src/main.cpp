@@ -131,14 +131,13 @@ void setDisplay(unsigned long display_number) {
 
 // updates timers according to rpm
 void updateTimer() {
-    
-    // start with smalest prescaler (index)
+    // start with smallest prescaler (index)
     int prescaler_index = 0;
 
     // top / trigger value for timer
     unsigned long long ocr = 0;
 
-    // if time would overflow with current prescaler, choose the next (bigger) prescaler until it doesn't 
+    // if time would overflow with current prescaler, choose the next (bigger) prescaler until it doesn't
     // overflow 16bit (divide freq by 100 because of centiHz)
     while (prescaler_index < 4 && (ocr = (16000000 / prescalers[prescaler_index].scaler) / (freq / 100.0)) > 65535) {
         prescaler_index++;
@@ -172,7 +171,7 @@ void setup() {
     // set all display pins to output
     for (int i = 0; i < 12; i++) pinMode(display_data.segments.arr[i], OUTPUT);
 
-    // pin with stobe light is output
+    // pin with strobe light is output
     pinMode(STROBE_PIN, OUTPUT);
 
     // in case you want to reset EEPROM
@@ -209,7 +208,7 @@ void setup() {
     prescalers[4].flags = (1 << CS12) | (1 << CS10);
 
     cli();  // disable timers
-    
+
     TCCR1A = 0;
     TCCR1B = 0;
     TIMSK1 |= (1 << OCIE1A);  // enables TIME1_COMPA_vect for interupt handling
@@ -240,7 +239,6 @@ void loop() {
 
     // only react if the cooldown from the last butten press is 0
     if (cooldown == 0) {
-        
         // set flag for updating the timer and EEPROM later
         bool save = true;
 
@@ -320,7 +318,7 @@ void loop() {
         display_scroll_cooldown = DISPLAY_SCROLL_SPEED;
     }
 
-    // dont show tenths or hundrets if they are 0
+    // dont show tenths or hundreds if they are 0
     if (display_digits[1] == 0 && display_digits[0] == 0)
         display_scroll_current = display_scroll_max - 3;
     else if (display_digits[0] == 0)
@@ -352,14 +350,14 @@ void loop() {
     pinMode(display_data.segments.names.d4, INPUT);
 }
 
-// iterrupt service for timer1 turns on strobe and resets timer2
+// interrupt service for timer1 turns on strobe and resets timer2
 ISR(TIMER1_COMPA_vect) {
     TCNT2 = 0;     // set timer2 to 0
     TIFR2 = 0xFF;  // clear timer2 flags
     STROBE_ON;
 }
 
-// iterrupt service for timer2 turns off stobe
+// interrupt service for timer2 turns off strobe
 ISR(TIMER2_COMPA_vect) {
     STROBE_OFF;
 }
